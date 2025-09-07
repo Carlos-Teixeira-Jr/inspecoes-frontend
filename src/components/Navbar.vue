@@ -2,17 +2,16 @@
   <Menubar :model="items">
     <!-- Slot start: logo ou marca -->
     <template #start>
-      <span class="text-white font-bold text-xl">Meu App</span>
+      <Button icon="pi pi-bars" label="Menu" class="mr-3" @click="$emit('toggle-sidebar')" />
+
+      <span class="text-blue-600 font-bold text-xl">Survey Inspec</span>
     </template>
 
     <!-- Slot end: avatar e campo de busca -->
     <template #end>
       <div class="flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Buscar..."
-          class="px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
-        />
+        <input type="text" placeholder="Buscar..."
+          class="px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300" />
         <!-- <img
           src="/images/avatar.png"
           alt="Avatar"
@@ -26,21 +25,26 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Menubar from 'primevue/menubar';
+import Sidebar from './Sidebar.vue';
 
 export default defineComponent({
-  components: { Menubar },
+  components: { Menubar, Sidebar },
   data() {
     return {
       items: [
         {
           label: 'Dashboard',
           icon: 'pi pi-home',
-          command: () => { console.log('Dashboard clicado') }
+          command: () => {
+            this.$router.push({ name: 'Dashboard' })
+          }
         },
         {
           label: 'Clientes',
           icon: 'pi pi-users',
-          command: () => { console.log('Clientes clicado') }
+          command: () => {
+            this.$router.push({ name: 'Customers' })
+          }
         },
         {
           label: 'Relatórios',
@@ -53,5 +57,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -4,7 +4,14 @@ export interface Cliente {
   id: number
   nome: string
   endereco: string
-  latitude?: number
-  longitude?: number
+  latitude: number
+  longitude: number
+  createdAt: string
+  updatedAt: string
   areas: Area[]
+}
+
+export interface ClientesResponse {
+  total: number
+  customers: Cliente[]
 }

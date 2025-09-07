@@ -7,6 +7,7 @@ import './style.css'; // Tailwind
 import 'primeicons/primeicons.css'; // Ícones PrimeVue
 
 import Lara from '@primeuix/themes/lara';
+import router from './router/index.js';
 
 const app = createApp(App);
 app.component('Button', Button);
@@ -17,5 +18,6 @@ app.use(PrimeVue, {
     }
 });
 
+app.use(router)
 
 app.mount('#app');

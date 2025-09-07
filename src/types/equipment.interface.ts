@@ -4,5 +4,8 @@ export interface Equipamento {
   id: number
   nome: string
   tipo: string
-  atividades: Atividade[]
+  areaId: number
+  createdAt: string
+  updatedAt: string
+  atividade: Atividade
 }

@@ -1,7 +1,29 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    /* Módulos e resolução */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    /* Integração com libs modernas */
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+
+    /* Qualidade do TS */
+    "strict": true,
+    "isolatedModules": true,
+
+    /* Qualidade de build */
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Caminhos e TS para Vue */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* Deprecações */
+    "ignoreDeprecations": "6.0"
+  }
 }
