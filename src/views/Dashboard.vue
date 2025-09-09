@@ -2,74 +2,84 @@
   <div class="p-6">
     <h1 class="text-3xl font-bold text-blue-600 mb-4">Dashboard</h1>
 
-    <div class="flex flex-col justify-between md:flex-row gap-4 w-full">
-      <!-- Cards de resumo -->
-      <div class="flex justify-between gap-4 mb-6 w-full">
-        <Card v-for="(item, index) in resumo" :key="index" class="shadow-lg w-full h-fit items-center">
+    <!-- Spinner de loading -->
+    <div v-if="isLoadingData" class="flex justify-center items-center h-96">
+      <ProgressSpinner />
+    </div>
+
+    <div v-else>
+      <div class="flex flex-col justify-between md:flex-row gap-4 w-full">
+        <!-- Cards de resumo -->
+        <div class="flex justify-between gap-4 mb-6 w-full">
+          <Card v-for="(item, index) in resumo" :key="index" class="shadow-lg w-full h-fit items-center">
+            <template #title>{{ item.titulo }}</template>
+            <template #content>
+              <p class="text-2xl font-bold m-0">{{ item.valor }}</p>
+            </template>
+          </Card>
+        </div>
+
+        <!-- Lista de próximas inspeções -->
+        <div class="bg-white shadow rounded p-4 w-fit">
+          <h2 class="text-xl font-semibold mb-2">Próximas Inspeções</h2>
+          <Listbox v-model="selectedInspecao" :options="pagedInspecoes" optionLabel="label"
+            class="w-fit whitespace-nowrap" />
+        </div>
+      </div>
+
+
+      <div class="flex justify-between w-full gap-4 my-6">
+        <Card v-for="(item, index) in inspecoesResumo" :key="index"
+          class="w-full items-center cursor-pointer shadow-lg hover:!shadow-xl rounded-2xl border border-white/20"
+          :style="{
+            '--p-card-body-padding': '10px',
+          }"
+          @click="toggleFiltro(item.titulo === 'pendentes' ? 'pendente' : item.titulo === 'concluídas' ? 'concluida' : 'atrasada')">
           <template #title>{{ item.titulo }}</template>
           <template #content>
-            <p class="text-2xl font-bold m-0">{{ item.valor }}</p>
+            <p :class="`text-2xl font-bold text-center ${item.color === 'green'
+              ? 'text-green-600'
+              : item.color === 'red'
+                ? 'text-red-600'
+                : 'text-yellow-600'
+              }`">
+              {{ item.valor }}
+            </p>
           </template>
         </Card>
       </div>
 
-      <!-- Lista de próximas inspeções -->
-      <div class="bg-white shadow rounded p-4 w-fit">
-        <h2 class="text-xl font-semibold mb-2">Próximas Inspeções</h2>
-        <Listbox v-model="selectedInspecao" :options="pagedInspecoes" optionLabel="label"
-          class="w-fit whitespace-nowrap" />
+
+
+      <!-- Tabela de alertas -->
+      <div class="bg-white shadow rounded p-4 mt-6">
+        <h2 class="text-xl font-semibold mb-2">Alertas</h2>
+        <DataTable :value="alertas" :paginator="true" :rows="rowsPerPage" :totalRecords="totalAlertas"
+          :loading="alertasLoading" @page="onPageChange" :lazy="true">
+          <Column field="cliente" header="Cliente" />
+          <Column field="tipo" header="Tipo" />
+          <Column field="data" header="Data" />
+          <Column field="status" header="Status">
+            <template #body="slotProps">
+              <div class="flex items-center gap-2">
+                <i :class="statusIcon(slotProps.data.status)"></i>
+                <span
+                  :class="`${slotProps.data.status === 'pendente' ? 'text-yellow-600' : slotProps.data.status === 'concluida' ? 'text-green-600' : 'text-red-600'} font-semibold`">
+                  {{ slotProps.data.status }}
+                </span>
+              </div>
+            </template>
+          </Column>
+        </DataTable>
       </div>
     </div>
 
-
-    <div class="flex justify-between w-full gap-4 my-6">
-      <Card v-for="(item, index) in inspecoesResumo" :key="index"
-        class="w-full items-center cursor-pointer shadow-lg hover:!shadow-xl rounded-2xl border border-white/20" :style="{
-          '--p-card-body-padding': '10px',
-        }" @click="toggleFiltro(item.titulo === 'pendentes' ? 'pendente' : item.titulo === 'concluídas' ? 'concluida' : 'atrasada')">
-        <template #title>{{ item.titulo }}</template>
-        <template #content>
-          <p :class="`text-2xl font-bold text-center ${item.color === 'green'
-            ? 'text-green-600'
-            : item.color === 'red'
-              ? 'text-red-600'
-              : 'text-yellow-600'
-            }`">
-            {{ item.valor }}
-          </p>
-        </template>
-      </Card>
-    </div>
-
-
-
-    <!-- Tabela de alertas -->
+    <!-- Mapa com clientes -->
     <div class="bg-white shadow rounded p-4 mt-6">
-      <h2 class="text-xl font-semibold mb-2">Alertas</h2>
-      <DataTable :value="alertas" :paginator="true" :rows="rowsPerPage" :totalRecords="totalAlertas"
-        :loading="alertasLoading" @page="onPageChange" :lazy="true">
-        <Column field="cliente" header="Cliente" />
-        <Column field="tipo" header="Tipo" />
-        <Column field="data" header="Data"/>
-        <Column field="status" header="Status">
-          <template #body="slotProps">
-            <div class="flex items-center gap-2">
-              <i :class="statusIcon(slotProps.data.status)"></i>
-              <span
-                :class="`${slotProps.data.status === 'pendente' ? 'text-yellow-600' : slotProps.data.status === 'concluida' ? 'text-green-600' : 'text-red-600'} font-semibold`">
-                {{ slotProps.data.status }}
-              </span>
-            </div>
-          </template>
-        </Column>
-      </DataTable>
+      <h2 class="text-xl font-semibold mb-2">Mapa de Clientes</h2>
+      <CustomersMap :clientes="clientes" />
     </div>
-  </div>
 
-  <!-- Mapa com clientes -->
-  <div class="bg-white shadow rounded p-4 mt-6">
-    <h2 class="text-xl font-semibold mb-2">Mapa de Clientes</h2>
-    <CustomersMap :clientes="clientes" />
   </div>
 </template>
 
@@ -97,6 +107,15 @@ const currentPageLB = ref(1);  // página atual
 
 const currentPage = ref(1);    // página atual
 const rowsPerPage = ref(10);   // linhas por página
+
+// Computed para controlar se deve mostrar spinner
+const isLoadingData = computed(() => {
+  return (
+    alertas.value.length === 0 &&
+    proximasInspecoes.value.length === 0 &&
+    resumo.value.length === 0
+  );
+});
 
 const pagedInspecoes = computed(() => {
   const start = (currentPageLB.value - 1) * pageSize.value;

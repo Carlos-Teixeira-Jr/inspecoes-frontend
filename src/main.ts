@@ -4,6 +4,8 @@ import PrimeVue from 'primevue/config';
 import Button from 'primevue/button';
 
 import './style.css'; // Tailwind
+import 'leaflet/dist/leaflet.css';
+
 import 'primeicons/primeicons.css'; // Ícones PrimeVue
 
 import Lara from '@primeuix/themes/lara';

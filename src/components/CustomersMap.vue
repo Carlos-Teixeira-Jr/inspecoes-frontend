@@ -1,40 +1,79 @@
 <template>
-  <div ref="mapContainer" class="w-full h-96 rounded shadow"></div>
+  <div id="map" class="h-96 w-full">
+</div>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { onMounted, watch, ref } from 'vue';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import type { Cliente } from '@/types/customer.interface';
 
-export default defineComponent({
-  name: 'CustomersMap',
-  setup() {
-    const mapContainer = ref<HTMLDivElement | null>(null);
+interface Props {
+  clientes: Cliente[];
+}
 
-    const clientes = [
-      { nome: 'Cliente A', lat: -23.55052, lng: -46.633308 },
-      { nome: 'Cliente B', lat: -22.906847, lng: -43.172896 },
-      { nome: 'Cliente C', lat: -19.92083, lng: -43.93778 },
-    ];
+const props = defineProps<Props>();
+const map = ref<L.Map | null>(null);
 
-    onMounted(() => {
-      if (mapContainer.value) {
-        const map = L.map(mapContainer.value).setView([-23.55, -46.63], 5);
+function addMarkers() {
+  if (!map.value) return;
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+  props.clientes.forEach(cliente => {
+    if (cliente.latitude && cliente.longitude) {
+      const marker = L.marker([cliente.latitude, cliente.longitude])
+        .bindPopup(`<b>${cliente.nome}</b><br>${cliente.endereco}`);
+      marker.addTo(map.value as L.Map); // <== cast explícito
+    }
+  });
+}
 
-        clientes.forEach(cliente => {
-          L.marker([cliente.lat, cliente.lng])
-            .addTo(map)
-            .bindPopup(cliente.nome);
-        });
+function logMarkerCoordinates() {
+  if (!map.value) return;
+
+  const coords: { lat: number; lng: number }[] = [];
+
+  map.value.eachLayer((layer: L.Layer) => {
+    if (layer instanceof L.Marker) {
+      const latlng = layer.getLatLng();
+      coords.push({ lat: latlng.lat, lng: latlng.lng });
+    }
+  });
+
+  console.log('Coordenadas dos marcadores:', coords);
+}
+
+
+onMounted(() => {
+  map.value = L.map('map').setView([-23.561142, -46.6579], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+  }).addTo(map.value as L.Map);
+
+  addMarkers();
+});
+
+// Watch seguro para atualizar marcadores
+watch(
+  () => props.clientes,
+  () => {
+    if (!map.value) return;
+
+    // remove apenas os markers
+    map.value.eachLayer((layer: L.Layer) => {
+      if (layer instanceof L.Marker) {
+        map.value?.removeLayer(layer);
       }
     });
 
-    return { mapContainer };
+    addMarkers();
   }
-});
+);
 </script>
+
+
+<style scoped>
+#map {
+  border-radius: 0.5rem;
+}
+</style>
