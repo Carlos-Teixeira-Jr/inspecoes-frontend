@@ -2,22 +2,38 @@
   <div class="p-6">
     <h1 class="text-3xl font-bold text-blue-600 mb-4">Dashboard</h1>
 
-    <!-- Cards de resumo -->
-    <div class="flex justify-between gap-4 mb-6">
-      <Card v-for="(item, index) in resumo" :key="index" class="shadow-lg w-full items-center">
-        <template #title>{{ item.titulo }}</template>
-        <template #content>
-          <p class="text-2xl font-bold m-0">{{ item.valor }}</p>
-        </template>
-      </Card>
+    <div class="flex flex-col justify-between md:flex-row gap-4 w-full">
+      <!-- Cards de resumo -->
+      <div class="flex justify-between gap-4 mb-6 w-full">
+        <Card v-for="(item, index) in resumo" :key="index" class="shadow-lg w-full h-fit items-center">
+          <template #title>{{ item.titulo }}</template>
+          <template #content>
+            <p class="text-2xl font-bold m-0">{{ item.valor }}</p>
+          </template>
+        </Card>
+      </div>
+
+      <!-- Lista de próximas inspeções -->
+      <div class="bg-white shadow rounded p-4 w-fit">
+        <h2 class="text-xl font-semibold mb-2">Próximas Inspeções</h2>
+        <Listbox v-model="selectedInspecao" :options="pagedInspecoes" optionLabel="label"
+          class="w-fit whitespace-nowrap" />
+      </div>
     </div>
 
-    <div class="flex justify-between w-full gap-4 mb-6">
+
+    <div class="flex justify-between w-full gap-4 my-6">
       <Card v-for="(item, index) in inspecoesResumo" :key="index"
-        class="shadow-lg p-4 w-full items-center cursor-pointer hover:!shadow-xl" @click="toggleFiltro(item.titulo)">
+        class="w-full items-center cursor-pointer shadow-lg hover:!shadow-xl rounded-2xl border border-white/20" :style="{
+          '--p-card-body-padding': '10px',
+        }" @click="toggleFiltro(item.titulo)">
         <template #title>{{ item.titulo }}</template>
         <template #content>
-          <p :class="`text-2xl font-bold text-center ${item.color === 'green' ? 'text-green-600' : item.color === 'red' ? 'text-red-600' : 'text-yellow-600'
+          <p :class="`text-2xl font-bold text-center ${item.color === 'green'
+            ? 'text-green-600'
+            : item.color === 'red'
+              ? 'text-red-600'
+              : 'text-yellow-600'
             }`">
             {{ item.valor }}
           </p>
@@ -25,11 +41,13 @@
       </Card>
     </div>
 
+
+
     <!-- Tabela de alertas -->
     <div class="bg-white shadow rounded p-4 mt-6">
       <h2 class="text-xl font-semibold mb-2">Alertas</h2>
-      <DataTable :value="alertasFiltrados" :paginator="true" :rows="rowsPerPage" :totalRecords="alertasFiltrados.length"
-        @page="onPageChange" tableStyle="width: 100%, min-width: 50rem, max-width: 100%, overflow: auto, display: block">
+      <DataTable :value="alertas" :paginator="true" :rows="rowsPerPage" :totalRecords="totalAlertas"
+        :loading="alertasLoading" @page="onPageChange">
         <Column field="cliente" header="Cliente" />
         <Column field="tipo" header="Tipo" />
         <Column field="data" header="Data" />
@@ -38,18 +56,13 @@
             <div class="flex items-center gap-2">
               <i :class="statusIcon(slotProps.data.status)"></i>
               <span
-                :class="`${slotProps.data.status === 'pendente' ? 'text-yellow-600' : slotProps.data.status === 'concluida' ? 'text-green-600' : 'text-red-600'} font-semibold`">{{
-                  slotProps.data.status }}</span>
+                :class="`${slotProps.data.status === 'pendente' ? 'text-yellow-600' : slotProps.data.status === 'concluida' ? 'text-green-600' : 'text-red-600'} font-semibold`">
+                {{ slotProps.data.status }}
+              </span>
             </div>
           </template>
         </Column>
       </DataTable>
-    </div>
-
-    <!-- Lista de próximas inspeções -->
-    <div class="bg-white shadow rounded p-4 mt-6">
-      <h2 class="text-xl font-semibold mb-2">Próximas Inspeções</h2>
-      <Listbox v-model="selectedInspecao" :options="proximasInspecoes" optionLabel="label" class="w-full md:w-96" />
     </div>
   </div>
 
@@ -68,9 +81,10 @@ import Column from 'primevue/column';
 import Listbox from 'primevue/listbox';
 import CustomersMap from '../components/CustomersMap.vue';
 import { Cliente, ClientesResponse } from '@/types/customer.interface';
-import { getClientes } from '../services/dataService';
+import { getClientes } from '../services/customers/customer.service';
 import { formatDateBR } from '../utils/datFormatter.util';
 import { statusIcon } from '../utils/status.util';
+import { getAlerts } from '../services/alerts/alerts.service';
 
 
 const clientes = ref<Cliente[]>([]);
@@ -78,13 +92,24 @@ const totalClientes = ref(0);
 const loading = ref(false);
 const filtroInspecao = ref<'pendentes' | 'concluidas' | 'atrasadas' | null>(null);
 
-function toggleFiltro(titulo: string) {
-  // converte para o tipo correto
-  const novoFiltro = titulo.toLowerCase() as 'pendentes' | 'concluidas' | 'atrasadas';
+const pageSize = ref(5);       // itens por página
+const currentPageLB = ref(1);  // página atual
 
-  // se clicar no mesmo filtro, desmarca
+const pagedInspecoes = computed(() => {
+  const start = (currentPageLB.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return proximasInspecoes.value.slice(start, end);
+});
+
+function toggleFiltro(titulo: string) {
+  const novoFiltro = titulo.toLowerCase() as 'pendentes' | 'concluidas' | 'atrasadas';
   filtroInspecao.value = filtroInspecao.value === novoFiltro ? null : novoFiltro;
+
+  // Recarrega alertas com novo filtro
+  currentPage.value = 1;
+  loadAlertas(currentPage.value, rowsPerPage.value, filtroInspecao.value);
 }
+
 
 const alertasFiltrados = computed(() => {
   switch (filtroInspecao.value) {
@@ -117,21 +142,37 @@ const inspecoesResumo = ref([
 console.log("🚀 ~ inspecoesResumo:", inspecoesResumo)
 
 
-const alertas = ref<any[]>([]);
 const totalRecords = ref(0);   // total de alertas do backend
 const currentPage = ref(1);    // página atual
 const rowsPerPage = ref(10);   // linhas por página
 
 function onPageChange(event: any) {
-  currentPage.value = event.page + 1; // PrimeVue começa da página 0
+  currentPage.value = event.page + 1;
   rowsPerPage.value = event.rows;
-
-  // Recarrega do backend
-  loadClientes(currentPage.value, rowsPerPage.value);
+  loadAlertas(currentPage.value, rowsPerPage.value, filtroInspecao.value);
 }
+
 
 const proximasInspecoes = ref<any[]>([]);
 const selectedInspecao = ref(null);
+
+const alertas = ref<any[]>([]);
+const totalAlertas = ref(0);
+const alertasLoading = ref(false);
+
+async function loadAlertas(page = 1, limit = 10, filtro: 'pendentes' | 'concluidas' | 'atrasadas' | null = null) {
+  alertasLoading.value = true;
+  try {
+    // Chamada ao backend passando pagina, limite e filtro
+    const data = await getAlerts(page, limit, filtro); // você precisará criar essa função no service
+    alertas.value = data.alerts;
+    totalAlertas.value = data.total;
+  } catch (err) {
+    console.error('Erro ao carregar alertas:', err);
+  } finally {
+    alertasLoading.value = false;
+  }
+}
 
 async function loadClientes(page = 1, limit = 10) {
   loading.value = true;
@@ -187,13 +228,15 @@ async function loadClientes(page = 1, limit = 10) {
         area.equipamentos.flatMap(equipamento =>
           equipamento.atividade
             ? [{
-              label: `Inspeção ${cliente.nome} - ${equipamento.tipo} - ${equipamento.atividade.data_proxima_inspecao ?? '-'}`,
+              label: `Inspeção ${cliente.nome} - ${equipamento.tipo} - ${formatDateBR(equipamento.atividade.data_proxima_inspecao) ?? '-'}`,
               value: equipamento.atividade.id,
             }]
             : []
         )
       )
     )
+    console.log("🚀 ~ proximasInspecoes.value:", proximasInspecoes.value)
+
 
     // Atualiza inspeções
     const pendentes = clientes.value.flatMap(cliente =>
@@ -225,7 +268,11 @@ async function loadClientes(page = 1, limit = 10) {
   }
 }
 
-onMounted(() => loadClientes());
+onMounted(() => {
+  loadClientes(); // cards e inspeções
+  loadAlertas(currentPage.value, rowsPerPage.value);
+});
+
 </script>
 
 <style scoped>

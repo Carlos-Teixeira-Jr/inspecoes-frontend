@@ -1,5 +1,5 @@
-import { api } from "../api/api";
-import type { Cliente } from "../types/customer.interface";
+import { api } from "../../api/api";
+import type { Cliente } from "../../types/customer.interface";
 
 export interface ClientesResponse {
   total: number;

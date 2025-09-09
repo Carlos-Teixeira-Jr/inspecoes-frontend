@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { getClientes } from '../services/dataService.js'
+import { getClientes } from '../services/customers/customer.service.js'
 import { Cliente } from '../types/customer.interface.js'
 import { ref, onMounted } from 'vue'
 

@@ -1,13 +1,12 @@
 <template>
   <!-- <div class="flex"> -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col min-h-screen">
       <Navbar @toggle-sidebar="visibleSidebar = !visibleSidebar" />
       <Sidebar :visible.sync="visibleSidebar" />
-      <main class="flex-1 overflow-auto">
+      <main class="flex-1">
         <!-- <Dashboard /> -->
         <router-view />
       </main>
-      <router-view />
     </div>
   <!-- </div> -->
 </template>
