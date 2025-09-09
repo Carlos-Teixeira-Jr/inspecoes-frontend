@@ -1,15 +1,16 @@
+import { formatDateBR } from "../../utils/datFormatter.util";
 import { api } from "../../api/api";
-import type { Cliente } from "../../types/customer.interface";
+import { Alerts } from "@/types/alerts.interface";
 
 export interface AlertsResponse {
   total: number;
-  alerts: Cliente[];
+  alerts: Alerts[];
 }
 
 export async function getAlerts(
   page: number = 1,
   limit: number = 10,
-  filtro: 'pendentes' | 'concluidas' | 'atrasadas' | null = null
+  filtro: 'pendente' | 'concluida' | 'atrasada' | null = null
 ): Promise<AlertsResponse> {
   const params: any = {
     page,
@@ -20,6 +21,13 @@ export async function getAlerts(
     params.status = filtro;
   }
 
-  const response = await api.get<AlertsResponse>('/api/alerts', { params });
+  const response = await api.get<AlertsResponse>('/alerts', { params });
+
+  const formatedResponse = response.data;
+  formatedResponse.alerts = formatedResponse.alerts.map((alert) => ({
+    ...alert,
+    data: formatDateBR(alert.data),
+  }));
+
   return response.data;
 }

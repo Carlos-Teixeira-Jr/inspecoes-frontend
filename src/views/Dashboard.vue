@@ -26,7 +26,7 @@
       <Card v-for="(item, index) in inspecoesResumo" :key="index"
         class="w-full items-center cursor-pointer shadow-lg hover:!shadow-xl rounded-2xl border border-white/20" :style="{
           '--p-card-body-padding': '10px',
-        }" @click="toggleFiltro(item.titulo)">
+        }" @click="toggleFiltro(item.titulo === 'pendentes' ? 'pendente' : item.titulo === 'concluídas' ? 'concluida' : 'atrasada')">
         <template #title>{{ item.titulo }}</template>
         <template #content>
           <p :class="`text-2xl font-bold text-center ${item.color === 'green'
@@ -47,10 +47,10 @@
     <div class="bg-white shadow rounded p-4 mt-6">
       <h2 class="text-xl font-semibold mb-2">Alertas</h2>
       <DataTable :value="alertas" :paginator="true" :rows="rowsPerPage" :totalRecords="totalAlertas"
-        :loading="alertasLoading" @page="onPageChange">
+        :loading="alertasLoading" @page="onPageChange" :lazy="true">
         <Column field="cliente" header="Cliente" />
         <Column field="tipo" header="Tipo" />
-        <Column field="data" header="Data" />
+        <Column field="data" header="Data"/>
         <Column field="status" header="Status">
           <template #body="slotProps">
             <div class="flex items-center gap-2">
@@ -90,10 +90,13 @@ import { getAlerts } from '../services/alerts/alerts.service';
 const clientes = ref<Cliente[]>([]);
 const totalClientes = ref(0);
 const loading = ref(false);
-const filtroInspecao = ref<'pendentes' | 'concluidas' | 'atrasadas' | null>(null);
+const filtroInspecao = ref<'pendente' | 'concluida' | 'atrasada' | null>(null);
 
 const pageSize = ref(5);       // itens por página
 const currentPageLB = ref(1);  // página atual
+
+const currentPage = ref(1);    // página atual
+const rowsPerPage = ref(10);   // linhas por página
 
 const pagedInspecoes = computed(() => {
   const start = (currentPageLB.value - 1) * pageSize.value;
@@ -102,28 +105,19 @@ const pagedInspecoes = computed(() => {
 });
 
 function toggleFiltro(titulo: string) {
-  const novoFiltro = titulo.toLowerCase() as 'pendentes' | 'concluidas' | 'atrasadas';
+  const novoFiltro = titulo.toLowerCase() as 'pendente' | 'concluida' | 'atrasada';
   filtroInspecao.value = filtroInspecao.value === novoFiltro ? null : novoFiltro;
 
-  // Recarrega alertas com novo filtro
+  // Reset page e recarrega
   currentPage.value = 1;
   loadAlertas(currentPage.value, rowsPerPage.value, filtroInspecao.value);
 }
 
-
-const alertasFiltrados = computed(() => {
-  switch (filtroInspecao.value) {
-    case 'pendentes':
-      return alertas.value.filter(a => a.status === 'pendente');
-    case 'concluidas':
-      return alertas.value.filter(a => a.status === 'concluida');
-    case 'atrasadas':
-      return alertas.value.filter(a => a.status === 'atrasada');
-    default:
-      return alertas.value;
-  }
-});
-
+function onPageChange(event: any) {
+  currentPage.value = event.page + 1;
+  rowsPerPage.value = event.rows;
+  loadAlertas(currentPage.value, rowsPerPage.value, filtroInspecao.value);
+}
 
 // Dados do dashboard
 const resumo = ref([
@@ -142,17 +136,6 @@ const inspecoesResumo = ref([
 console.log("🚀 ~ inspecoesResumo:", inspecoesResumo)
 
 
-const totalRecords = ref(0);   // total de alertas do backend
-const currentPage = ref(1);    // página atual
-const rowsPerPage = ref(10);   // linhas por página
-
-function onPageChange(event: any) {
-  currentPage.value = event.page + 1;
-  rowsPerPage.value = event.rows;
-  loadAlertas(currentPage.value, rowsPerPage.value, filtroInspecao.value);
-}
-
-
 const proximasInspecoes = ref<any[]>([]);
 const selectedInspecao = ref(null);
 
@@ -160,7 +143,7 @@ const alertas = ref<any[]>([]);
 const totalAlertas = ref(0);
 const alertasLoading = ref(false);
 
-async function loadAlertas(page = 1, limit = 10, filtro: 'pendentes' | 'concluidas' | 'atrasadas' | null = null) {
+async function loadAlertas(page = 1, limit = 10, filtro: 'pendente' | 'concluida' | 'atrasada' | null = null) {
   alertasLoading.value = true;
   try {
     // Chamada ao backend passando pagina, limite e filtro
@@ -204,23 +187,6 @@ async function loadClientes(page = 1, limit = 10) {
       }, 0) ?? 0;
       return acc + equipamentosCliente;
     }, 0);
-
-    // Atualiza alertas
-    alertas.value = clientes.value.flatMap(cliente =>
-      cliente.areas.flatMap(area =>
-        area.equipamentos.flatMap(equipamento =>
-          equipamento.atividade
-            ? [{
-              cliente: cliente.nome,
-              tipo: equipamento.tipo,
-              data: formatDateBR(equipamento.atividade.data_proxima_inspecao) ?? '-',
-              status: equipamento.atividade.alerta === 'Atraso > 7 dias' ? 'atrasada' : equipamento.atividade.status,
-              alerta: equipamento.atividade.alerta ?? '',
-            }]
-            : []
-        )
-      )
-    )
 
     // Atualiza próximas inspeções
     proximasInspecoes.value = clientes.value.flatMap(cliente =>
@@ -269,6 +235,7 @@ async function loadClientes(page = 1, limit = 10) {
 }
 
 onMounted(() => {
+  loadAlertas(currentPage.value, rowsPerPage.value);
   loadClientes(); // cards e inspeções
   loadAlertas(currentPage.value, rowsPerPage.value);
 });
