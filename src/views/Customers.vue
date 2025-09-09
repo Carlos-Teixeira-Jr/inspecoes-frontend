@@ -44,9 +44,9 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { DataTable, Column } from "primevue";
-import type { Cliente } from "@/types/customer.interface";
+import type { Cliente } from "../types/customer.interface";
 import { getClientes, ClientesResponse } from "../services/customers/customer.service";
-import { Equipamento } from "@/types/equipment.interface";
+import { Equipamento } from "../types/equipment.interface";
 
 export default defineComponent({
   name: "Clientes",
