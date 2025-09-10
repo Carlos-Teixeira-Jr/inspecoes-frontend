@@ -9,6 +9,7 @@ body {
 body {
   @apply bg-cover bg-center bg-no-repeat bg-fixed;
   background-image: url('/bg.png');
+  font-family: 'Inter', sans-serif !important;
 }
 
 
@@ -19,8 +20,105 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 1rem;
   color: #e5e7eb !important;
+  width: 10rem !important;
 }
 
 .p-card-body {
   gap: 0 !important;
+  padding: 2% !important;
+}
+
+/* Força o Menubar a se comportar como um container flex com justify-between */
+.p-menubar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.p-datatable-table-container {
+  border: 0 !important;
+  border-radius: 8px !important;
+}
+
+@media (max-width: 768px) {
+  .p-card-body {
+    padding-top: 5% !important;
+    padding-bottom: 5% !important;
+    padding-left: 5% !important;
+    padding-right: 5% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .p-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .p-card-title {
+    font-size: smaller !important;
+  }
+
+  .p-datatable-tbody, tr, td {
+    padding: 0.5rem !important;
+    font-size: small !important;
+    text-wrap: nowrap !important;
+  }
+
+  .p-paginator {
+    padding: 0 !important;
+  }
+
+  .p-menubar-button {
+    width: 100% !important;
+  }
+
+  .p-menubar-button {
+    width: fit-content !important;
+  }
+
+  .p-menubar-root-list {
+    width: fit-content !important;
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  .p-listbox-option {
+    font-size: small !important;
+  }
+
+  .p-menubar-start {
+    width: 100% !important;
+    gap: 0 !important;
+  }
+
+  .p-paginator-content {
+    width: 100% !important;
+    gap: 0 !important;
+  }
+
+  .p-paginator-page, .p-paginator-next, .p-paginator-last, .p-paginator-first, .p-paginator-prev {
+    width: fit-content !important;
+    min-width: none !important;
+  }
+
+  .p-paginator-pages {
+    width: fit-content !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .p-paginator-page, .p-paginator-page-selected {
+    font-size: smaller !important;
+    width: fit-content !important;
+  }
 }

@@ -1,3 +1,5 @@
+import { setTransitionHooks } from 'vue';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -5,7 +7,11 @@ export default {
     "./src/**/*.{vue,js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif']
+      }
+    },
   },
   plugins: [],
 }

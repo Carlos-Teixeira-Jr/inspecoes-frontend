@@ -1,152 +1,191 @@
 <template>
-  <!-- <div class="flex flex-column h-full">-->
-
-    <Sidebar v-model:visible="internalVisible" position="left" class="w-80" :dismissable="true">
-      <template #container="{ closeCallback }">
-        <div class="flex flex-col h-full">
-          <!-- Header -->
-          <div class="flex items-center w-full justify-between px-4 py-3 shrink-0 border-b-1 surface-border">
-            <span class="text-xl font-bold">Dashboard Menu</span>
-            <Button icon="pi pi-times" @click="closeCallback" rounded outlined class="p-button-text" />
-          </div>
-
-          <!-- Content -->
-          <div class="overflow-y-auto flex-grow-1">
-            <!-- Visão Geral -->
-            <div class="p-3">
-              <h3 class="text-lg font-semibold mb-2">Visão Geral</h3>
-              <ul class="list-none p-0 m-0">
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterStatus('concluida')">Concluídas</li>
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterStatus('pendente')">Pendentes</li>
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterStatus('atrasada')">Atrasadas</li>
-              </ul>
-            </div>
-
-            <!-- Clientes / Locais -->
-            <div class="p-3">
-              <h3 class="text-lg font-semibold mb-2">Clientes / Locais</h3>
-              <ul class="list-none p-0 m-0">
-                <li v-for="cliente in clientes" :key="cliente.nome" class="mb-2">
-                  <div @click="toggleCliente(cliente.nome)" class="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer">
-                    {{ cliente.nome }}
-                    <i :class="{'pi pi-chevron-down': !cliente.open, 'pi pi-chevron-up': cliente.open}"></i>
-                  </div>
-                  <ul v-if="cliente.open" class="pl-4 mt-1">
-                    <li v-for="area in cliente.areas" :key="area.nome" class="p-1 hover:bg-gray-50 cursor-pointer" @click="filterArea(cliente.nome, area.nome)">
-                      {{ area.nome }}
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Equipamentos / Inspeções -->
-            <div class="p-3">
-              <h3 class="text-lg font-semibold mb-2">Equipamentos / Inspeções</h3>
-              <div class="mb-2">
-                <label for="tipoEquipamento" class="block mb-1">Tipo de Equipamento</label>
-                <Dropdown :options="tiposEquipamento" v-model="filtroEquipamento" placeholder="Selecione" class="w-full" />
-              </div>
-              <div>
-                <label for="statusEquipamento" class="block mb-1">Status</label>
-                <Dropdown :options="['concluida','pendente','atrasada']" v-model="filtroStatus" placeholder="Selecione" class="w-full" />
-              </div>
-            </div>
-
-            <!-- Alertas e Próximas Inspeções -->
-            <div class="p-3">
-              <h3 class="text-lg font-semibold mb-2">Alertas</h3>
-              <ul class="list-none p-0 m-0">
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterAlerta('urgente')">Urgente</li>
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterAlerta('atraso')">Atraso > 7 dias</li>
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterAlerta('risco')">Risco elétrico próximo</li>
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterAlerta('baixa')">Baixa pressão de água</li>
-                <li class="p-2 hover:bg-gray-100 cursor-pointer" @click="filterAlerta('falha')">Falha crítica</li>
-              </ul>
-            </div>
-
-            <!-- Mapa (opcional) -->
-            <div class="p-3">
-              <Button label="Visualizar Mapa" icon="pi pi-map" class="w-full" @click="abrirMapa" />
-            </div>
-          </div>
+  <Sidebar v-model:visible="internalVisible" position="left" class="w-80" :dismissable="true">
+    <template #container="{ closeCallback }">
+      <div class="flex flex-col h-full">
+        <!-- Header -->
+        <div class="flex items-center w-full justify-between px-4 py-3 shrink-0 border-b-1 surface-border">
+          <span class="text-xl font-bold">Dashboard Menu</span>
+          <Button icon="pi pi-times" @click="closeCallback" rounded outlined class="p-button-text" />
         </div>
-      </template>
-    </Sidebar>
-  <!-- </div> -->
+
+        <!-- Content -->
+        <div class="overflow-y-auto flex-grow-1">
+          <!-- Visão Geral -->
+          <div class="p-3">
+            <h3 class="text-lg font-semibold mb-2">Visão Geral</h3>
+            <ul class="list-none p-0 m-0">
+              <li class="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                @click="filterStatus('concluida')">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-check-circle text-green-600"></i>
+                  Concluídas
+                </div>
+                <span class="font-bold text-green-600">{{ totalConcluidas }}</span>
+              </li>
+              <li class="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                @click="filterStatus('pendente')">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-exclamation-triangle text-yellow-600"></i>
+                  Pendentes
+                </div>
+                <span class="font-bold text-yellow-600">{{ totalPendentes }}</span>
+              </li>
+              <li class="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                @click="filterStatus('atrasada')">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-times-circle text-red-600"></i>
+                  Atrasadas
+                </div>
+                <span class="font-bold text-red-600">{{ totalAtrasadas }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Clientes / Locais -->
+          <div class="p-3">
+            <h3 class="text-lg font-semibold mb-2">Clientes / Locais</h3>
+            <ul class="list-none p-0 m-0">
+              <li v-for="cliente in clientesStore.clientes" :key="cliente.id" class="mb-2">
+                <div @click="toggleCliente(cliente.id)"
+                  class="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer">
+                  {{ cliente.nome }}
+                  <i :class="{ 'pi pi-chevron-down': !isOpen(cliente.id), 'pi pi-chevron-up': isOpen(cliente.id) }"></i>
+                </div>
+                <ul v-if="isOpen(cliente.id)" class="pl-4 mt-1">
+                  <li v-for="area in cliente.areas" :key="area.id" class="p-1 hover:bg-gray-50 cursor-pointer"
+                    @click="filterArea(cliente.nome, area.nome)">
+                    {{ area.nome }}
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Equipamentos / Inspeções -->
+          <div class="p-3">
+            <h3 class="text-lg font-semibold mb-2">Equipamentos / Inspeções</h3>
+            <div class="mb-2">
+              <label class="block mb-1">Tipo de Equipamento</label>
+              <Dropdown :options="tiposEquipamento" v-model="filtroEquipamento" placeholder="Selecione"
+                class="w-full" />
+            </div>
+            <div>
+              <label class="block mb-1">Status</label>
+              <Dropdown :options="['concluida', 'pendente', 'atrasada']" v-model="filtroStatus" placeholder="Selecione"
+                class="w-full" />
+            </div>
+          </div>
+
+          <!-- Alertas -->
+          <div class="p-3">
+            <h3 class="text-lg font-semibold mb-2">Alertas</h3>
+            <ul class="list-none p-0 m-0">
+              <li v-for="alert in alertasStore.alerts" :key="alert.id" class="p-2 hover:bg-gray-100 cursor-pointer"
+                @click="filterAlerta(alert.tipo)">
+                {{ alert.tipo }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- Botão Buscar -->
+          <div class="p-3">
+            <Button label="Buscar" icon="pi pi-search" class="w-full" @click="buscarClientes" />
+
+            <!-- Mensagem de erro -->
+            <p v-if="erroBusca" class="mt-2 text-red-600 font-semibold">
+              Nenhum cliente encontrado com os filtros selecionados.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </template>
+  </Sidebar>
 </template>
 
-<script setup>
-import { ref, reactive, defineProps, watch } from 'vue';
+<script setup lang="ts">
+import { ref, watch, computed } from 'vue';
 import Sidebar from 'primevue/sidebar';
 import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
+import { useClientesStore } from '../stores/customers.store';
+import { useAlertsStore } from '../stores/alerts.store';
+import { getFilteredClientes } from '../services/customers/customer.service';
 
-const props = defineProps({
-  visible: { type: Boolean, required: true }
-});
-
-// Controle da sidebar
-const visible = ref(false);
-
+// Props
+const props = defineProps({ visible: { type: Boolean, required: true } });
 const emit = defineEmits(['update:visible']);
-
-// Vincula a prop ao ref interno
 const internalVisible = ref(props.visible);
+const erroBusca = ref(false);
 
-// Sempre que a prop mudar, atualiza o ref interno
-watch(() => props.visible, (val) => {
-  internalVisible.value = val;
-});
+// Stores
+const clientesStore = useClientesStore();
+const alertasStore = useAlertsStore();
 
-// Sempre que o ref interno mudar, emite para o pai
-watch(internalVisible, (val) => {
-  emit('update:visible', val);
-});
+// Sincroniza com o pai
+watch(() => props.visible, val => internalVisible.value = val);
+watch(internalVisible, val => emit('update:visible', val));
 
 // Filtros
 const filtroEquipamento = ref(null);
 const filtroStatus = ref(null);
+const filtrosAtivos = ref({
+  status: null as "pendente" | "concluida" | "atrasada" | null,
+  cliente: null as string | null,
+  area: null as string | null,
+  tipoEquipamento: null as string | null,
+  alerta: null as string | null
+});
+console.log("🚀 ~ filtrosAtivos:", filtrosAtivos)
 
-// Lista de clientes (exemplo do JSON simplificado)
-const clientes = reactive([
-  { nome: 'Condomínio Vila Paulista', open: false, areas: [{ nome: 'Cobertura' }, { nome: 'Edifício 1' }] },
-  { nome: 'Shopping Atlântico', open: false, areas: [{ nome: 'Cobertura' }, { nome: 'Subsolo' }] },
-  { nome: 'Hospital Santa Clara', open: false, areas: [{ nome: 'Ala Sul' }, { nome: 'Bloco B' }, { nome: 'Ala Norte' }] }
-]);
 
-const tiposEquipamento = ['Alarme','Extintor','Sprinkler','Porta Corta-Fogo','Hidrante','Bomba de Incêndio'];
+// Clientes abertos no menu
+const clientesOpen = ref(new Map<number, boolean>());
+function toggleCliente(id: number) { clientesOpen.value.set(id, !clientesOpen.value.get(id)); }
+function isOpen(id: number) { return clientesOpen.value.get(id) || false; }
 
-// Funções de interação
-function toggleCliente(nome) {
-  const cliente = clientes.find(c => c.nome === nome);
-  if (cliente) cliente.open = !cliente.open;
+// Computeds para resumo
+const totalConcluidas = computed(() => clientesStore.clientes.flatMap(c => c.areas.flatMap(a => a.equipamentos.filter(e => e.atividade?.status === 'concluida'))).length);
+const totalPendentes = computed(() => clientesStore.clientes.flatMap(c => c.areas.flatMap(a => a.equipamentos.filter(e => e.atividade?.status === 'pendente'))).length);
+const totalAtrasadas = computed(() => clientesStore.clientes.flatMap(c => c.areas.flatMap(a => a.equipamentos.filter(e => e.atividade?.alerta === 'Atraso > 7 dias'))).length);
+
+// Métodos de filtro
+function filterStatus(status: "pendente" | "concluida" | "atrasada") {
+  filtrosAtivos.value.status = status;
 }
+function filterArea(cliente: string, area: string) { filtrosAtivos.value.cliente = cliente; filtrosAtivos.value.area = area; }
+function filterAlerta(alerta: string) { filtrosAtivos.value.alerta = alerta; }
 
-function filterStatus(status) {
-  console.log('Filtrando por status:', status);
-}
+watch(filtroEquipamento, val => filtrosAtivos.value.tipoEquipamento = val);
+watch(filtroStatus, val => filtrosAtivos.value.status = val);
 
-function filterArea(cliente, area) {
-  console.log('Filtrando por cliente:', cliente, 'e área:', area);
-}
+// Tipos de equipamento
+const tiposEquipamento = ['Alarme', 'Extintor', 'Sprinkler', 'Porta Corta-Fogo', 'Hidrante', 'Bomba de Incêndio'];
 
-function filterAlerta(tipo) {
-  console.log('Filtrando alerta:', tipo);
-}
+// Função Buscar
+async function buscarClientes() {
+  try {
+    const data = await getFilteredClientes({
+      status: filtrosAtivos.value.status ?? undefined,
+      cliente: filtrosAtivos.value.cliente ?? undefined,
+      area: filtrosAtivos.value.area ?? undefined,
+      tipoEquipamento: filtrosAtivos.value.tipoEquipamento ?? undefined,
+      alerta: filtrosAtivos.value.alerta === "Atraso > 7 dias" ? filtrosAtivos.value.alerta : undefined
+    });
 
-function abrirMapa() {
-  console.log('Abrindo mapa...');
+    // Atualiza store
+    clientesStore.clientes = data.customers;
+
+    // Verifica se retornou algum cliente
+    erroBusca.value = data.customers.length === 0;
+
+    // Fecha sidebar
+    internalVisible.value = false;
+    emit('update:visible', false);
+
+  } catch (err) {
+    console.error('Erro ao buscar clientes:', err);
+    erroBusca.value = true; // também mostra erro se a requisição falhar
+  }
 }
 </script>
-
-<style scoped>
-/* Ajustes simples de hover e layout */
-.hover\:bg-gray-100:hover {
-  background-color: #f5f5f5;
-}
-.hover\:bg-gray-50:hover {
-  background-color: #fafafa;
-}
-</style>
-

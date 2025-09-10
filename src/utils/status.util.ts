@@ -1,4 +1,4 @@
-export function statusIcon(status: 'pendente' | 'concluida' | 'atrasada'): string {
+export function statusIcon(status: 'pendente' | 'concluida' | 'atrasada' | null): string {
   switch (status) {
     case 'pendente':
       return 'pi pi-clock text-yellow-500';

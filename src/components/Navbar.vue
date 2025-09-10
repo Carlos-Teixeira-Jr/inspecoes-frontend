@@ -1,25 +1,34 @@
 <template>
-  <Menubar :model="items">
-    <!-- Slot start: logo ou marca -->
-    <template #start>
-      <Button icon="pi pi-bars" label="Menu" class="mr-3" @click="$emit('toggle-sidebar')" />
+  <header class="fixed top-0 left-0 w-full z-50 bg-white shadow-md">
+    <Menubar :model="items" class="!border-0 !rounded-none">
+      <!-- Start slot: logo + botão -->
+      <template #start>
+        <div class="flex items-center w-full md:justify-start gap-3">
+          <!-- Botão de menu apenas mobile -->
+          <Button
+            icon="pi pi-bars"
+            class="md:hidden"
+            @click="$emit('toggle-sidebar')"
+          />
+          <img
+            src="../public/images/style/logo.webp"
+            alt="Logo"
+            class="w-40 bg-gray-400 rounded-2xl p-2"
+          />
+        </div>
+      </template>
 
-      <span class="text-blue-600 font-bold text-xl">Survey Inspec</span>
-    </template>
-
-    <!-- Slot end: avatar e campo de busca -->
-    <template #end>
-      <div class="flex items-center gap-2">
-        <input type="text" placeholder="Buscar..."
-          class="px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300" />
-        <!-- <img
-          src="/images/avatar.png"
-          alt="Avatar"
-          class="w-8 h-8 rounded-full"
-        /> -->
-      </div>
-    </template>
-  </Menubar>
+      <template #end>
+        <div class="flex items-center gap-2 justify-end w-full md:justify-start">
+          <input
+            type="text"
+            placeholder="Buscar..."
+            class="hidden sm:block px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
+      </template>
+    </Menubar>
+  </header>
 </template>
 
 <script lang="ts">
@@ -49,7 +58,9 @@ export default defineComponent({
         {
           label: 'Relatórios',
           icon: 'pi pi-chart-bar',
-          command: () => { console.log('Relatórios clicado') }
+          command: () => { 
+            this.$router.push({ name: 'Reports' })
+           }
         }
       ]
     }

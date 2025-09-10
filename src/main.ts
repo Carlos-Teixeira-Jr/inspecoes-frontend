@@ -10,15 +10,30 @@ import 'primeicons/primeicons.css'; // Ícones PrimeVue
 
 import Lara from '@primeuix/themes/lara';
 import router from './router/index.js';
+import { Toast, ToastService } from 'primevue';
+import Chart from 'primevue/chart';
+import 'chart.js/auto'
+import { createPinia } from 'pinia';
 
 const app = createApp(App);
-app.component('Button', Button);
+
+// cria a instância do pinia
+const pinia = createPinia()
+
+// registra no app
+app.use(pinia)
 
 app.use(PrimeVue, {
     theme: {
         preset: Lara
     }
 });
+
+app.use(ToastService)
+
+app.component('Button', Button);
+app.component('Toast', Toast);
+app.component('Chart', Chart)
 
 app.use(router)
 
