@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-gray-900 text-gray-300 py-6 mt-10 shadow-inner">
+  <footer class="bg-gray-900 text-gray-300 py-6 mt-10 shadow-inner w-full">
     <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
       <!-- Logo / Nome -->
       <div class="flex items-center gap-2">

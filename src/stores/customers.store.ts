@@ -1,7 +1,12 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { Cliente } from "@/types/customer.interface";
-import { getClientes, ClientesResponse } from "../services/customers/customer.service";
+import type { Cliente } from "../types/customer.interface";
+import {
+  getClientes,
+  ClientesResponse,
+  getFilteredClientes,
+  ClientesFilters,
+} from "../services/customers/customer.service";
 
 export const useClientesStore = defineStore("clientes", () => {
   const clientes = ref<Cliente[]>([]);
@@ -25,6 +30,19 @@ export const useClientesStore = defineStore("clientes", () => {
     }
   }
 
+  async function fetchClientesFiltered(filters: ClientesFilters) {
+    try {
+      loading.value = true;
+      const data = await getFilteredClientes(filters); // sua função de API
+      clientes.value = data.customers;
+      total.value = data.total;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     clientes,
     total,
@@ -32,5 +50,6 @@ export const useClientesStore = defineStore("clientes", () => {
     limit,
     loading,
     fetchClientes,
+    fetchClientesFiltered
   };
 });

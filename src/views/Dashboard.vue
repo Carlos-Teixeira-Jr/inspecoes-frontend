@@ -11,10 +11,10 @@
     <div v-else>
       <div class="flex flex-col md:flex-row gap-6 w-full">
         <div class="flex flex-col gap-6 w-full justify-around">
-          <div class="flex flex-col gap-3 w-full mt-10 md:mt-3">
+          <div class="flex flex-col gap-3 w-full mt-5 md:mt-3">
                 <h1 class="text-5xl font-bold text-gray-200 mb-4">Dashboard</h1>
             <!-- Cards de resumo -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 w-fit">
+            <div class="grid grid-cols-4 gap-1 md:gap-4 w-fit">
               <Card v-for="(item, index) in resumo" :key="index"
                 class="shadow-lg h-fit flex items-center justify-center">
                 <template #title>{{ item.titulo }}</template>
@@ -26,7 +26,7 @@
               </Card>
             </div>
 
-            <div class="grid grid-cols-3 xl:grid-cols-4 gap-4 w-full mt-6">
+            <div class="grid grid-cols-3 xl:grid-cols-4 gap-4 w-full md:mt-6">
               <Card v-for="(item, index) in inspecoesResumo" :key="index"
                 class="cursor-pointer shadow-lg hover:!shadow-xl rounded-2xl border border-white/20 flex w-full items-center justify-center"
                 :style="{ '--p-card-body-padding': '10px' }" @click="

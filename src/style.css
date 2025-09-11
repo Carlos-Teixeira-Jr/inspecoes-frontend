@@ -63,7 +63,7 @@ body {
   }
 
   .p-card-title {
-    font-size: smaller !important;
+    font-size: 12px !important;
   }
 
   .p-datatable-tbody, tr, td {
@@ -120,5 +120,9 @@ body {
   .p-paginator-page, .p-paginator-page-selected {
     font-size: smaller !important;
     width: fit-content !important;
+  }
+
+  .p-button-label {
+    font-size: smaller !important;
   }
 }
