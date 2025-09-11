@@ -8,10 +8,15 @@ body {
 
 body {
   @apply bg-cover bg-center bg-no-repeat bg-fixed;
-  background-image: url('/bg.png');
-  font-family: 'Inter', sans-serif !important;
+  background-image: url("/bg.png");
+  font-family: "Inter", sans-serif !important;
 }
 
+main {
+  max-width: 1920px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
 
 .p-card {
   background: rgba(255, 255, 255, 0.25) !important;
@@ -66,7 +71,9 @@ body {
     font-size: 12px !important;
   }
 
-  .p-datatable-tbody, tr, td {
+  .p-datatable-tbody,
+  tr,
+  td {
     padding: 0.5rem !important;
     font-size: small !important;
     text-wrap: nowrap !important;
@@ -104,7 +111,11 @@ body {
     gap: 0 !important;
   }
 
-  .p-paginator-page, .p-paginator-next, .p-paginator-last, .p-paginator-first, .p-paginator-prev {
+  .p-paginator-page,
+  .p-paginator-next,
+  .p-paginator-last,
+  .p-paginator-first,
+  .p-paginator-prev {
     width: fit-content !important;
     min-width: none !important;
   }
@@ -117,7 +128,8 @@ body {
     gap: 0 !important;
   }
 
-  .p-paginator-page, .p-paginator-page-selected {
+  .p-paginator-page,
+  .p-paginator-page-selected {
     font-size: smaller !important;
     width: fit-content !important;
   }
