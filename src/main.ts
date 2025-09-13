@@ -8,7 +8,7 @@ import 'leaflet/dist/leaflet.css';
 
 import 'primeicons/primeicons.css'; // Ícones PrimeVue
 
-import Lara from '@primeuix/themes/lara/light/theme.css';
+import Lara from '@primeuix/themes/lara';
 import router from './router/index.js';
 import { Toast, ToastService } from 'primevue';
 import Chart from 'primevue/chart';
