@@ -295,7 +295,7 @@ const chartData = computed(() => {
     </div>
 
     <div class="overflow-x-auto md:mt-6">
-      <DataTable :value="flatEquipamentos" class="mt-6" responsiveLayout="scroll">
+      <DataTable :value="flatEquipamentos" class="mt-6 tables" responsiveLayout="scroll">
         <Column field="cliente" header="Cliente" sortable></Column>
         <Column field="area" header="Área" sortable></Column>
         <Column field="equipamento" header="Equipamento" sortable></Column>

@@ -61,6 +61,13 @@ export default defineComponent({
           command: () => { 
             this.$router.push({ name: 'Reports' })
            }
+        },
+        {
+          label: 'Nova página',
+          icon: 'pi pi-chart-bar',
+          command: () => {
+            this.$router.push({ name: 'NewPage' })
+          }
         }
       ]
     }

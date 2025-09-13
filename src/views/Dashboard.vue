@@ -1,5 +1,5 @@
 <template>
-  <div class="md:p-6 p-2 mt-15">
+  <div class="md:p-6 md:max-w-full p-2 mt-15 max-w-sm dashboard">
 
 
     <!-- Spinner global -->
@@ -106,19 +106,14 @@ import ProgressSpinner from "primevue/progressspinner";
 import CustomersMap from "../components/CustomersMap.vue";
 import { statusIcon } from "../utils/status.util";
 import { formatDateBR } from "../utils/datFormatter.util";
-
-// Stores
 import { useClientesStore } from "../stores/customers.store";
 import { useAlertsStore } from "../stores/alerts.store";
 
 const clientesStore = useClientesStore();
 const alertsStore = useAlertsStore();
 
-// refs do store (mantém reatividade sem precisar usar store.variavel)
-const { clientes, total, loading } = storeToRefs(clientesStore);
-const { alerts, total: totalAlertas, loading: alertasLoading } = storeToRefs(alertsStore);
+const { clientes, total } = storeToRefs(clientesStore);
 
-// dashboard states
 const loadingDashboard = ref(true);
 const filtroInspecao = ref<"pendente" | "concluida" | "atrasada" | null>(null);
 const pageSize = ref(5);

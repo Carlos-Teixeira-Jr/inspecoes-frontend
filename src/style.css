@@ -12,10 +12,15 @@ body {
   font-family: "Inter", sans-serif !important;
 }
 
-main {
-  max-width: 1920px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+@media (min-width: 1440px) {
+  main {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+.tables {
+  max-width: 1440px !important;
 }
 
 .p-card {
@@ -33,7 +38,6 @@ main {
   padding: 2% !important;
 }
 
-/* Força o Menubar a se comportar como um container flex com justify-between */
 .p-menubar {
   display: flex !important;
   justify-content: space-between !important;
@@ -49,6 +53,10 @@ main {
 }
 
 @media (max-width: 768px) {
+  .p-datatable-wrapper {
+    overflow-x: auto !important;
+  }
+
   .p-card-body {
     padding-top: 5% !important;
     padding-bottom: 5% !important;
@@ -58,6 +66,18 @@ main {
     flex-direction: column !important;
     align-items: center !important;
     width: 100% !important;
+  }
+
+  .p-datatable-wrapper {
+    overflow-x: auto !important;
+  }
+
+  .tables {
+    max-width: 360px !important;
+  }
+
+  .p-datatable {
+    max-width: 1440px;
   }
 
   .p-card {
@@ -136,5 +156,17 @@ main {
 
   .p-button-label {
     font-size: smaller !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .tables {
+    max-width: 430px !important;
+  }
+}
+
+@media (max-width: 412px) {
+  .tables {
+    max-width: 412px !important;
   }
 }

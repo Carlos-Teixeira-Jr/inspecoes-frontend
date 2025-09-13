@@ -1,6 +1,6 @@
 <template>
   <!-- <div class="flex"> -->
-    <div class="flex-1 flex flex-col min-h-screen">
+    <div class="flex-1 flex flex-col min-h-screen w-full">
       <Navbar @toggle-sidebar="visibleSidebar = !visibleSidebar" />
       <Sidebar :visible.sync="visibleSidebar" />
 

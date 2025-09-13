@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2 pt-22">
+  <div class="p-2 pt-22 w-full">
     <h2 class="text-2xl font-bold mb-4 text-gray-200">Lista de Clientes</h2>
 
     <!-- Spinner aparece enquanto está carregando -->
@@ -19,7 +19,7 @@
       :lazy="true"
       @page="onPageChange"
       responsiveLayout="scroll"
-      class="shadow-lg rounded"
+      class="shadow-lg rounded tables"
     >
       <!-- Coluna de expansão -->
       <Column expander style="width: 3em" />
@@ -156,7 +156,7 @@ export default defineComponent({
       total,
       page,
       limit,
-      loading, // ✅ exporta o estado
+      loading,
       statusIcon,
       onPageChange,
       onRowToggle,
